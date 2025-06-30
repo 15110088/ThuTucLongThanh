@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Tra cứu Đất đai - Đồng Nai 2025</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/684/684908.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', 'Be Vietnam Pro', sans-serif; background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); }
+        .main-section { display: none; }
+        .main-section.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link { transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .nav-link.active, .nav-link:hover { color: #2563eb; border-bottom-color: #2563eb; }
+        .procedure-card { background: linear-gradient(120deg, #fff 60%, #e0f2fe 100%); border-radius: 1.25rem; padding: 1.25rem; border: 2px solid transparent; cursor: pointer; box-shadow: 0 6px 24px -4px #2563eb22; transition: border-color 0.2s, box-shadow 0.2s; position: relative; overflow: hidden; }
+        .procedure-card.active, .procedure-card:hover { border-color: #2563eb; box-shadow: 0 8px 32px -4px #2563eb33; }
+        .procedure-card .icon { font-size: 2.5rem; margin-bottom: 0.5rem; color: #2563eb; }
+        .chart-wrapper { background: #fff; padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 10px 24px -6px #2563eb22; border: 1px solid #e0e7ff; }
+        .chart-container { position: relative; width: 100%; margin: auto; }
+        .accordion-item { margin-bottom: 1rem; border-radius: 1rem; border: 1.5px solid #e0e7ef; box-shadow: 0 2px 8px -2px #2563eb22; transition: box-shadow 0.2s, border-color 0.2s; }
+        .accordion-item.active { box-shadow: 0 4px 16px -2px #2563eb33; border-color: #2563eb; }
+        .accordion-header { cursor: pointer; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 1.08rem; font-weight: 600; transition: background 0.2s; border-radius: 1rem; }
+        .accordion-item.active > .accordion-header { background: #e0e7ff; }
+        .accordion-icon { transition: transform 0.3s; font-size: 1.5rem; }
+        .accordion-item.active > .accordion-header .accordion-icon { transform: rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(.4,2,.6,1), background 0.2s; background: #f8fafc; border-radius: 0 0 1rem 1rem; padding: 0 1.5rem; }
+        .accordion-item.active > .accordion-content { max-height: 600px; padding-bottom: 1.5rem; padding-top: 1rem; background: #f0f6ff; }
+        .sub-accordion-item .accordion-header { background: #f1f5f9; }
+        .legal-content h4 { font-weight: 600; color: #1e293b; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .legal-content ul, .legal-content ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        .legal-content li { margin-bottom: 0.5rem; }
+        .hero-bg {
+            background: linear-gradient(120deg, #2563eb 60%, #38bdf8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        #three-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .hero-bg > .container {
+            position: relative;
+            z-index: 1;
+        }
+        .modal-bg { background: rgba(30,41,59,0.5); position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; border-radius: 1.5rem; padding: 2rem; max-width: 600px; width: 100%; box-shadow: 0 10px 40px -8px #2563eb55; position: relative; }
+        .close-modal { position: absolute; top: 1rem; right: 1rem; cursor: pointer; font-size: 1.5rem; color: #64748b; }
+    </style>
+</head>
+<body class="text-slate-800">
+    <!-- HEADER -->
+    <header class="bg-white/90 backdrop-blur-lg shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <img src="https://cdn-icons-png.flaticon.com/512/684/684908.png" alt="logo" class="h-9 w-9">
+                    <h1 class="text-2xl font-extrabold text-blue-700 tracking-tight">Văn phòng Đăng ký đất dai tỉnh Đồng Nai Chi nhánh Long Thành</h1>
+                </div>
+                <div class="hidden md:flex items-baseline space-x-2 lg:space-x-4">
+                    <a href="#thu-tuc" class="nav-link px-3 py-2 text-base font-semibold">Tra cứu Thủ tục</a>
+                    <a href="#chi-phi" class="nav-link px-3 py-2 text-base font-semibold">Ước tính Chi phí</a>
+                    <a href="#van-ban" class="nav-link px-3 py-2 text-base font-semibold">Thư viện Pháp lý</a>
+                </div>
+                <div class="md:hidden">
+                    <select id="mobile-nav" class="bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-base focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="thu-tuc">Tra cứu Thủ tục</option>
+                        <option value="chi-phi">Ước tính Chi phí</option>
+                        <option value="van-ban">Thư viện Pháp lý</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- HERO SECTION -->
+    <section class="hero-bg py-12 md:py-20 text-white text-center">
+        <canvas id="three-bg"></canvas>
+        <div class="container mx-auto px-4 flex flex-col items-center">
+            <h2 class="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">Cổng Tra cứu Đất đai Đồng Nai 2025</h2>
+            <p class="text-lg md:text-2xl font-medium mb-6 max-w-2xl mx-auto">Nền tảng tra cứu thủ tục, phí, pháp lý đất đai hiện đại, minh bạch, hỗ trợ người dân và doanh nghiệp Đồng Nai.</p>
+            <a href="#thu-tuc" class="inline-block bg-white text-blue-700 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-blue-50 transition text-lg">Bắt đầu tra cứu ngay</a>
+        </div>
+    </section>
+    
+  
+    <main class="container mx-auto p-4 md:p-8">
+        <!-- SECTION 1: TRA CỨU THỦ TỤC -->
+        <section id="thu-tuc" class="main-section">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Tra cứu Thủ tục Hành chính</h2>
+                <p class="mt-2 text-slate-600 max-w-3xl mx-auto">Chọn một thủ tục để xem chi tiết hồ sơ, thời gian, phí/lệ phí và các lưu ý quan trọng.</p>
+            </div>
+            <div class="mb-6 flex justify-center">
+                <input id="search-proc" type="text" placeholder="Tìm kiếm thủ tục..." class="border border-slate-300 rounded-lg px-4 py-2 w-full max-w-md focus:ring focus:ring-blue-200" />
+            </div>
+            <div id="procedures-grid" class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+        </section>
+        <!-- Modal chi tiết thủ tục -->
+        <div id="modal-bg" class="modal-bg" style="display:none;">
+            <div class="modal-content">
+                <span class="close-modal" id="close-modal">&times;</span>
+                <div id="modal-detail"></div>
+                </div>
+            </div>
+        <!-- SECTION 2: ƯỚC TÍNH CHI PHÍ -->
+        <section id="chi-phi" class="main-section">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">2. Ước tính Phí và Lệ phí</h2>
+                <p class="mt-2 text-slate-600 max-w-3xl mx-auto">Chọn thông tin để tính toán chi phí theo quy định mới nhất.</p>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 justify-center">
+                <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 w-full md:w-2/3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Loại phí</label>
+                            <select id="fee-type" class="w-full border border-slate-300 rounded-lg px-4 py-2 mb-2"></select>
+                        </div>
+                        <!-- Ẩn dropdown Hình thức nộp -->
+                        <div style="display:none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Hình thức nộp</label>
+                            <select id="fee-method" class="w-full border border-slate-300 rounded-lg px-4 py-2 mb-2"></select>
+                        </div>
+                        <div id="group-wrap" style="display:none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Nhóm nghiệp vụ</label>
+                            <select id="fee-group" class="w-full border border-slate-300 rounded-lg px-4 py-2 mb-2"></select>
+                        </div>
+                        <div id="asset-wrap" style="display:none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Loại tài sản</label>
+                            <select id="fee-asset" class="w-full border border-slate-300 rounded-lg px-4 py-2 mb-2"></select>
+                    </div>
+                        <div id="area-wrap" style="display:none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Khu vực</label>
+                            <select id="fee-area" class="w-full border border-slate-300 rounded-lg px-4 py-2 mb-2"></select>
+                        </div>
+                        <div id="page-wrap" style="display:none">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Số trang</label>
+                            <input id="fee-page" type="number" min="1" value="5" class="w-full border border-slate-300 rounded-lg px-4 py-2 mb-2" />
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <div id="fee-result-row" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                        <div id="fee-note" class="text-sm text-slate-500 mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- SECTION 3: VĂN BẢN PHÁP LÝ -->
+        <section id="van-ban" class="main-section">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">3. Thư viện Pháp lý</h2>
+                <p class="mt-2 text-slate-600 max-w-3xl mx-auto">Tra cứu căn cứ pháp lý và phí/lệ phí của từng thủ tục.</p>
+            </div>
+            <div id="legal-accordion" class="space-y-4 max-w-4xl mx-auto"></div>
+        </section>
+    </main>
+      <!-- THỐNG KÊ THỦ TỤC -->
+      <section class="py-12 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Thống kê Thời gian Giải quyết Thủ tục</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto">So sánh thời gian giải quyết các loại thủ tục hành chính đất đai</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 text-center">Biểu đồ Thời gian Giải quyết</h3>
+                    <div class="chart-container" style="height: 400px;">
+                        <canvas id="timeChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4 text-center">Thống kê Tổng quan</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 bg-blue-50 rounded-xl">
+                            <div class="text-2xl font-bold text-blue-700" id="totalProcedures">0</div>
+                            <div class="text-sm text-blue-600">Tổng thủ tục</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-xl">
+                            <div class="text-2xl font-bold text-green-700" id="avgTime">0</div>
+                            <div class="text-sm text-green-600">TB thời gian (ngày)</div>
+                        </div>
+                        <div class="text-center p-4 bg-orange-50 rounded-xl">
+                            <div class="text-2xl font-bold text-orange-700" id="minTime">0</div>
+                            <div class="text-sm text-orange-600">Thời gian ngắn nhất</div>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-xl">
+                            <div class="text-2xl font-bold text-red-700" id="maxTime">0</div>
+                            <div class="text-sm text-red-600">Thời gian dài nhất</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 bg-slate-50 rounded-xl">
+                        <h4 class="font-semibold text-slate-900 mb-2">Phân loại theo thời gian:</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>Nhanh (≤ 5 ngày):</span>
+                                <span class="font-semibold text-green-600" id="fastCount">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Trung bình (6-15 ngày):</span>
+                                <span class="font-semibold text-orange-600" id="mediumCount">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Chậm (> 15 ngày):</span>
+                                <span class="font-semibold text-red-600" id="slowCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Logo Section -->
+    <section class="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4"></h2>
+                <p class="text-lg text-gray-600"></p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" id="logo-container">
+                <!-- Logos will be loaded here -->
+            </div>
+        </div>
+    </section>
+    <!-- FOOTER -->
+    <footer class="bg-gradient-to-tr from-blue-900 to-blue-700 text-slate-200 mt-16">
+        <div class="container mx-auto px-6 py-10 text-center text-sm">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+                <div class="flex items-center gap-2 justify-center md:justify-start">
+                   
+                </div>
+                <div class="flex gap-4 justify-center md:justify-end">
+                    <a href="#" class="hover:text-blue-300" title="Facebook"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.595 0 0 .592 0 1.326v21.348C0 23.408.595 24 1.325 24h11.495v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.406 24 24 23.408 24 22.674V1.326C24 .592 23.406 0 22.675 0"/></svg></a>
+                    <a href="#" class="hover:text-blue-300" title="Zalo"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-size="10" fill="#2563eb" font-family="Arial">Zalo</text></svg></a>
+                </div>
+            </div>
+            <div class="mb-6 text-slate-100">
+                <h3 class="font-bold text-lg mb-2">Thông tin liên hệ</h3>
+                <p class="font-semibold">Văn phòng Đăng ký đất dai tỉnh Đồng Nai Chi nhánh Long Thành</p>
+                <p class="text-slate-300">Địa chỉ: Trung tâm hành chính công các xã An Phước, Long Thành, Bình An, Long Phước, Phước Thái tỉnh Đồng Nai.</p>
+                <p class="text-slate-300">Số điện thoại: 0251 2225 035 - 0251 3525 448</p>
+            </div>
+            <div class="border-t border-blue-800 pt-6">
+                <p><strong class="font-semibold text-white">Lưu ý:</strong> Thông tin trên trang này chỉ có tính chất tham khảo, không thay thế văn bản pháp luật chính thức.</p>
+                <p class="mt-2">Để có thông tin chính xác tuyệt đối, vui lòng liên hệ cơ quan nhà nước có thẩm quyền.</p>
+                <p class="mt-4 text-xs text-blue-200">&copy; 2025 Văn phòng Đăng ký đất dai tỉnh Đồng Nai Chi nhánh Long Thành. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- SCRIPTS: fetch dữ liệu từ thutuc.json và render động -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- THREE.JS BACKGROUND ANIMATION ---
+ 
+   
+   
+        // --- NAVIGATION LOGIC ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.main-section');
+        const mobileNav = document.getElementById('mobile-nav');
+        function navigateTo(targetId) {
+            sections.forEach(section => section.classList.toggle('active', section.id === targetId));
+            navLinks.forEach(link => link.classList.toggle('active', link.hash === `#${targetId}`));
+            if(mobileNav.value !== targetId) mobileNav.value = targetId;
+            window.scrollTo(0, 0);
+        }
+        navLinks.forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(e.currentTarget.hash.substring(1)); }));
+        mobileNav.addEventListener('change', (e) => navigateTo(e.currentTarget.value));
+        // --- FETCH DATA FROM thutuc.json ---
+        fetch('https://raw.githubusercontent.com/15110088/DB/refs/heads/master/thutuc.json')
+        .then(res => res.json())
+        .then(json => {
+            const procedures = json.data["Trinh tu thu tuc"];
+            
+            // --- THỐNG KÊ THỜI GIAN GIẢI QUYẾT ---
+            function parseTime(timeStr) {
+                if (!timeStr) return 0;
+                
+                // Tìm tất cả số trong chuỗi
+                const numbers = timeStr.match(/\d+/g);
+                if (!numbers || numbers.length === 0) return 0;
+                
+                // Chuyển đổi thành số và lấy số lớn nhất
+                const times = numbers.map(num => parseInt(num));
+                return Math.max(...times);
+            }
+            
+            function updateStatistics() {
+                const timeData = procedures.map(proc => ({
+                    name: proc["TenVietTat"] || proc["Tên thủ tục"],
+                    time: parseTime(proc["Thời gian giải quyết"]),
+                    originalTime: proc["Thời gian giải quyết"] || ''
+                })).filter(item => item.time > 0);
+                
+                // Tính toán thống kê
+                const times = timeData.map(item => item.time);
+                const total = timeData.length;
+                const avg = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+                const min = times.length > 0 ? Math.min(...times) : 0;
+                const max = times.length > 0 ? Math.max(...times) : 0;
+                
+                // Phân loại
+                const fast = times.filter(t => t <= 5).length;
+                const medium = times.filter(t => t > 5 && t <= 15).length;
+                const slow = times.filter(t => t > 15).length;
+                
+                // Cập nhật UI
+                document.getElementById('totalProcedures').textContent = total;
+                document.getElementById('avgTime').textContent = avg;
+                document.getElementById('minTime').textContent = min;
+                document.getElementById('maxTime').textContent = max;
+                document.getElementById('fastCount').textContent = fast;
+                document.getElementById('mediumCount').textContent = medium;
+                document.getElementById('slowCount').textContent = slow;
+                
+                // Vẽ biểu đồ
+                const ctx = document.getElementById('timeChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: timeData.slice(0, 10).map(item => item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name),
+                        datasets: [{
+                            label: 'Thời gian (ngày)',
+                            data: timeData.slice(0, 10).map(item => item.time),
+                            backgroundColor: timeData.slice(0, 10).map(item => {
+                                if (item.time <= 5) return 'rgba(34, 197, 94, 0.8)';
+                                if (item.time <= 15) return 'rgba(249, 115, 22, 0.8)';
+                                return 'rgba(239, 68, 68, 0.8)';
+                            }),
+                            borderColor: timeData.slice(0, 10).map(item => {
+                                if (item.time <= 5) return 'rgba(34, 197, 94, 1)';
+                                if (item.time <= 15) return 'rgba(249, 115, 22, 1)';
+                                return 'rgba(239, 68, 68, 1)';
+                            }),
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const originalTime = timeData[context.dataIndex]?.originalTime || '';
+                                        return [
+                                            `Thời gian: ${context.parsed.y} ngày`,
+                                            `Chi tiết: ${originalTime}`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Số ngày'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Gọi hàm thống kê sau khi load dữ liệu
+            updateStatistics();
+            
+        // --- PROCEDURE TOOL LOGIC ---
+            const proceduresGrid = document.getElementById('procedures-grid');
+            const searchProc = document.getElementById('search-proc');
+            const modalBg = document.getElementById('modal-bg');
+            const modalDetail = document.getElementById('modal-detail');
+            const closeModal = document.getElementById('close-modal');
+            let filteredProcedures = procedures;
+            proceduresGrid.className = "grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+            function renderProcedures(list) {
+                proceduresGrid.innerHTML = '';
+                list.forEach((proc, idx) => {
+                const card = document.createElement('div');
+                    card.className = 'procedure-card flex flex-col justify-center items-center text-center shadow-lg hover:shadow-2xl transition bg-white/90 rounded-2xl border border-slate-200 p-6 min-h-[220px]';
+                    card.innerHTML = `
+                        <div class="icon mb-2">📄</div>
+                        <h3 class="font-bold text-base text-slate-900 mb-2">${proc["TenVietTat"] || proc["Tên thủ tục"]}</h3>
+                        <p class="text-xs text-slate-500 mb-2">${proc["Thời gian giải quyết"] || ''}</p>
+                        <button class="mt-auto text-blue-600 underline">Xem chi tiết</button>
+                    `;
+                    card.querySelector('button').onclick = () => showModal(proc);
+                    proceduresGrid.appendChild(card);
+                });
+            }
+            function showModal(proc) {
+                modalDetail.innerHTML = `
+                    <h3 class="text-2xl font-bold text-blue-700 mb-4 text-center">${proc["Tên thủ tục"]}</h3>
+                    <div class="mb-3"><strong>Căn cứ pháp lý:</strong><br><span class="text-slate-700 text-sm">${proc["Căn cứ pháp lý"] || ''}</span></div>
+                    <div class="mb-3"><strong>Thành phần hồ sơ giấy tờ:</strong><ul class="list-disc pl-5 text-slate-700 text-sm">${Array.isArray(proc["Thành phần hồ sơ giấy tờ"]) ? proc["Thành phần hồ sơ giấy tờ"].map(i=>`<li>${i}</li>`).join('') : `<li>${proc["Thành phần hồ sơ giấy tờ"]||''}</li>`}</ul></div>
+                    <div class="mb-3"><strong>Thời gian giải quyết:</strong> <span class="text-slate-700 text-sm">${proc["Thời gian giải quyết"]||''}</span></div>
+                    <div class="mb-3"><strong>Ghi chú:</strong><ul class="list-disc pl-5 text-slate-700 text-sm">${Array.isArray(proc["Ghi chú"]) ? proc["Ghi chú"].map(i=>`<li>${i}</li>`).join('') : (proc["Ghi chú"] ? `<li>${proc["Ghi chú"]}</li>` : '')}</ul></div>
+                    <div class="mb-3"><strong>Phí và lệ phí:</strong><ul class="list-disc pl-5 text-slate-700 text-sm">${Array.isArray(proc["Phí và lệ phí"]) ? proc["Phí và lệ phí"].map(i=>`<li>${i}</li>`).join('') : (proc["Phí và lệ phí"] ? `<li>${proc["Phí và lệ phí"]}</li>` : '')}</ul></div>
+                `;
+                modalBg.style.display = 'flex';
+            }
+            closeModal.onclick = () => { modalBg.style.display = 'none'; };
+            modalBg.onclick = (e) => { if(e.target === modalBg) modalBg.style.display = 'none'; };
+            searchProc.addEventListener('input', function() {
+                const val = this.value.trim().toLowerCase();
+                filteredProcedures = procedures.filter(p => p["Tên thủ tục"].toLowerCase().includes(val));
+                renderProcedures(filteredProcedures);
+            });
+            renderProcedures(procedures);
+            // --- FEE ESTIMATION LOGIC ---
+            const donGia1 = json.data["Don gia 1"];
+            const feeTypeEl = document.getElementById('fee-type');
+            const feeMethodEl = document.getElementById('fee-method');
+            const feeGroupEl = document.getElementById('fee-group');
+            const feeAssetEl = document.getElementById('fee-asset');
+            const feeAreaEl = document.getElementById('fee-area');
+            const feePageEl = document.getElementById('fee-page');
+            const groupWrap = document.getElementById('group-wrap');
+            const assetWrap = document.getElementById('asset-wrap');
+            const areaWrap = document.getElementById('area-wrap');
+            const pageWrap = document.getElementById('page-wrap');
+            const feeResult = document.getElementById('fee-result-row');
+            const feeNote = document.getElementById('fee-note');
+            // Populate fee type
+            const feeTypes = Object.keys(donGia1);
+            feeTypeEl.innerHTML = feeTypes.map(t => `<option value="${t}">${t}</option>`).join('');
+            function updateMethod() {
+                const type = feeTypeEl.value;
+                const methods = Object.keys(donGia1[type]);
+                feeMethodEl.innerHTML = methods.map(m => `<option value="${m}">${m}</option>`).join('');
+                // Luôn chọn giá trị đầu tiên
+                feeMethodEl.value = methods[0] || '';
+            }
+            function updateGroup() {
+                const type = feeTypeEl.value;
+                const method = feeMethodEl.value;
+                const group = donGia1[type][method];
+                if (typeof group === 'object' && !Array.isArray(group)) {
+                    const groups = Object.keys(group);
+                    if (groups.length && typeof group[groups[0]] === 'object' && !Array.isArray(group[groups[0]])) {
+                        groupWrap.style.display = '';
+                        feeGroupEl.innerHTML = groups.map(g => `<option value="${g}">${g}</option>`).join('');
+                    } else {
+                        groupWrap.style.display = 'none';
+                        feeGroupEl.innerHTML = '';
+                    }
+                } else {
+                    groupWrap.style.display = 'none';
+                    feeGroupEl.innerHTML = '';
+                }
+            }
+            function updateAsset() {
+                const type = feeTypeEl.value;
+                const method = feeMethodEl.value;
+                const group = feeGroupEl.value;
+                let asset = donGia1[type][method];
+                if (group) asset = asset[group];
+                if (typeof asset === 'object' && !Array.isArray(asset)) {
+                    const assets = Object.keys(asset);
+                    if (typeof asset[assets[0]] === 'number') {
+                        assetWrap.style.display = '';
+                        feeAssetEl.innerHTML = assets.map(a => `<option value="${a}">${a}</option>`).join('');
+                    } else {
+                        assetWrap.style.display = 'none';
+                        feeAssetEl.innerHTML = '';
+                    }
+                } else {
+                    assetWrap.style.display = 'none';
+                    feeAssetEl.innerHTML = '';
+                }
+            }
+            function updateArea() {
+                const type = feeTypeEl.value;
+                if (type === 'LỆ PHÍ (NQ21)') {
+                    areaWrap.style.display = '';
+                    feeAreaEl.innerHTML = ['Huyện, xã', 'Thành phố'].map(a => `<option value="${a}">${a}</option>`).join('');
+                } else {
+                    areaWrap.style.display = 'none';
+                    feeAreaEl.innerHTML = '';
+                }
+            }
+            function updatePage() {
+                const type = feeTypeEl.value;
+                if (type === 'KTTT (NQ24)') {
+                    pageWrap.style.display = '';
+                } else {
+                    pageWrap.style.display = 'none';
+                }
+            }
+            function formatCurrency(val) {
+                return val ? val.toLocaleString('vi-VN', {style:'currency', currency:'VND'}) : '-';
+            }
+            function calcFee() {
+                const type = feeTypeEl.value;
+                const method = feeMethodEl.value;
+                const group = feeGroupEl.value;
+                const asset = feeAssetEl.value;
+                const area = feeAreaEl.value;
+                const page = parseInt(feePageEl.value) || 5;
+                let direct = null, online = null, note = '';
+                if (type === 'KTTT (NQ24)') {
+                    // KTTT: 5 trang đầu, T6 trở đi
+                    const first5 = donGia1[type]['5 trang đầu'] || 0;
+                    const next = donGia1[type]['T6 trở đi'] || 0;
+                    const value = (page <= 5) ? first5 : first5 + (page-5)*next;
+                    direct = value;
+                    note = 'Tính cho số trang hồ sơ kỹ thuật thửa đất.';
+                } else if (type === 'LỆ PHÍ (NQ21)') {
+                    // LỆ PHÍ: Nhà ở gắn liền với đất > IN MỚI/T4 > Huyện, xã/Thành phố
+                    const groupVal = donGia1[type]['Nhà ở gắn liền với đất'];
+                    const sub = groupVal[feeGroupEl.value||'IN MỚI'];
+                    direct = sub[area||'Huyện, xã'] || 0;
+                    note = 'Lệ phí cấp giấy chứng nhận.';
+                } else {
+                    // PHÍ có thể có cả Trực tiếp và Trực tuyến
+                    let objDirect = donGia1[type]['Trực tiếp'];
+                    let objOnline = donGia1[type]['Trực tuyến'];
+                    if (feeGroupEl.value) {
+                        objDirect = objDirect ? objDirect[feeGroupEl.value] : undefined;
+                        objOnline = objOnline ? objOnline[feeGroupEl.value] : undefined;
+                    }
+                    if (feeAssetEl.value) {
+                        objDirect = objDirect ? objDirect[feeAssetEl.value] : undefined;
+                        objOnline = objOnline ? objOnline[feeAssetEl.value] : undefined;
+                    }
+                    if (typeof objDirect === 'number') direct = objDirect;
+                    if (typeof objOnline === 'number') online = objOnline;
+                    note = 'Áp dụng theo nghị quyết mới nhất.';
+                }
+                // Hiển thị song song
+                let html = '';
+                if (direct !== null && online !== null) {
+                    html = `
+                    <div class="p-6 bg-blue-50 rounded-xl border border-blue-200 flex flex-col items-center">
+                        <span class="text-base font-semibold text-blue-700 mb-1">Trực tiếp</span>
+                        <span class="text-2xl font-bold text-blue-900">${formatCurrency(direct)}</span>
+                    </div>
+                    <div class="p-6 bg-green-50 rounded-xl border border-green-200 flex flex-col items-center">
+                        <span class="text-base font-semibold text-green-700 mb-1">Trực tuyến</span>
+                        <span class="text-2xl font-bold text-green-900">${formatCurrency(online)}</span>
+                    </div>`;
+                } else if (direct !== null) {
+                    html = `<div class="p-6 bg-blue-50 rounded-xl border border-blue-200 flex flex-col items-center">
+                        <span class="text-base font-semibold text-blue-700 mb-1">Trực tiếp</span>
+                        <span class="text-2xl font-bold text-blue-900">${formatCurrency(direct)}</span>
+                    </div>`;
+                } else if (online !== null) {
+                    html = `<div class="p-6 bg-green-50 rounded-xl border border-green-200 flex flex-col items-center">
+                        <span class="text-base font-semibold text-green-700 mb-1">Trực tuyến</span>
+                        <span class="text-2xl font-bold text-green-900">${formatCurrency(online)}</span>
+                    </div>`;
+                } else {
+                    html = `<div class="text-slate-400 italic">Không có dữ liệu phí/lệ phí cho lựa chọn này.</div>`;
+                }
+                document.getElementById('fee-result-row').innerHTML = html;
+                feeNote.textContent = note;
+            }
+            feeTypeEl.onchange = function() {
+                updateMethod(); updateGroup(); updateAsset(); updateArea(); updatePage(); calcFee();
+            };
+            feeMethodEl.onchange = function() { updateGroup(); updateAsset(); calcFee(); };
+            feeGroupEl.onchange = function() { updateAsset(); updateArea(); calcFee(); };
+            feeAssetEl.onchange = function() { calcFee(); };
+            feeAreaEl.onchange = function() { calcFee(); };
+            feePageEl.oninput = function() { calcFee(); };
+            // Init
+            updateMethod(); updateGroup(); updateAsset(); updateArea(); updatePage(); calcFee();
+        // --- LEGAL DOCS ACCORDION LOGIC ---
+            const legalAccordion = document.getElementById('legal-accordion');
+            procedures.forEach((proc, idx) => {
+                const item = document.createElement('div');
+                item.className = 'accordion-item';
+                item.innerHTML = `
+                    <div class="accordion-header">
+                        <span class="truncate block pr-2">${proc["Tên thủ tục"]}</span>
+                        <span class="accordion-icon text-blue-500 font-bold">▼</span>
+                    </div>
+                    <div class="accordion-content text-slate-700 text-sm">
+                        <div class="mb-2"><strong>Căn cứ pháp lý:</strong><div>${proc["Căn cứ pháp lý"]||''}</div></div>
+                        <div><strong>Phí và lệ phí:</strong><ul class="list-disc pl-5">${Array.isArray(proc["Phí và lệ phí"]) ? proc["Phí và lệ phí"].map(i=>`<li>${i}</li>`).join('') : (proc["Phí và lệ phí"] ? `<li>${proc["Phí và lệ phí"]}</li>` : '')}</ul></div>
+                    </div>
+                `;
+                legalAccordion.appendChild(item);
+            });
+            legalAccordion.addEventListener('click', function(e) {
+                const header = e.target.closest('.accordion-header');
+                if (header) {
+                    const item = header.parentElement;
+                    if (item.classList.contains('active')) {
+                        item.classList.remove('active');
+                    } else {
+                        // Đóng các accordion khác
+                        legalAccordion.querySelectorAll('.accordion-item.active').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                    }
+                }
+            });
+        });
+        // --- INIT ---
+        navigateTo(window.location.hash ? window.location.hash.substring(1) : 'thu-tuc');
+    });
+    (function() {
+        const canvas = document.getElementById('three-bg');
+        if (!canvas) return;
+        let width = canvas.offsetWidth;
+        let height = canvas.offsetHeight;
+        let renderer, scene, camera, particles, particleGeo, particleMat, animationId;
+        function resize() {
+            width = canvas.parentElement.offsetWidth;
+            height = canvas.parentElement.offsetHeight;
+            renderer.setSize(width, height, false);
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+        }
+        function init() {
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setClearColor(0x000000, 0);
+            renderer.setSize(width, height, false);
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, width / height, 1, 1000);
+            camera.position.z = 120;
+            // Particles
+            const PARTICLE_COUNT = 90;
+            particleGeo = new THREE.BufferGeometry();
+            const positions = [];
+            const velocities = [];
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const x = (Math.random() - 0.5) * 120;
+                const y = (Math.random() - 0.5) * 60;
+                const z = (Math.random() - 0.5) * 80;
+                positions.push(x, y, z);
+                velocities.push((Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2, (Math.random()-0.5)*0.2);
+            }
+            particleGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            particleGeo.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
+            particleMat = new THREE.PointsMaterial({ color: 0xffffff, size: 3.5, opacity: 0.7, transparent: true });
+            particles = new THREE.Points(particleGeo, particleMat);
+            scene.add(particles);
+        }
+        function animate() {
+            const pos = particleGeo.getAttribute('position');
+            const vel = particleGeo.getAttribute('velocity');
+            for (let i = 0; i < pos.count; i++) {
+                let x = pos.getX(i) + vel.getX(i);
+                let y = pos.getY(i) + vel.getY(i);
+                let z = pos.getZ(i) + vel.getZ(i);
+                // Bounce
+                if (x < -60 || x > 60) vel.setX(i, -vel.getX(i));
+                if (y < -30 || y > 30) vel.setY(i, -vel.getY(i));
+                if (z < -40 || z > 40) vel.setZ(i, -vel.getZ(i));
+                pos.setXYZ(i, x, y, z);
+            }
+            pos.needsUpdate = true;
+            renderer.render(scene, camera);
+            animationId = requestAnimationFrame(animate);
+        }
+        function start() {
+            width = canvas.parentElement.offsetWidth;
+            height = canvas.parentElement.offsetHeight;
+            init();
+            resize();
+            animate();
+        }
+        function stop() {
+            if (animationId) cancelAnimationFrame(animationId);
+            if (renderer) renderer.dispose();
+        }
+        window.addEventListener('resize', () => {
+            resize();
+        });
+        setTimeout(start, 100); // Delay to ensure hero section is rendered
+    })();
+    </script>
+    <script>
+        // Logo data for 19 procedures
+        const logoData = [
+            {
+                id: 1,
+                name: "Chuyển quyền",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M8 12l2 2 6-6"/>
+                </svg>`,
+                color: "text-blue-600",
+                bgColor: "bg-blue-100"
+            },
+            {
+                id: 2,
+                name: "Điều chỉnh thông tin",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                </svg>`,
+                color: "text-green-600",
+                bgColor: "bg-green-100"
+            },
+            {
+                id: 3,
+                name: "Gia hạn",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>`,
+                color: "text-yellow-600",
+                bgColor: "bg-yellow-100"
+            },
+            {
+                id: 4,
+                name: "Hạn chế liền kề",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>`,
+                color: "text-purple-600",
+                bgColor: "bg-purple-100"
+            },
+            {
+                id: 5,
+                name: "Giải quyết tranh chấp",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M9 9h6v6H9z"/>
+                </svg>`,
+                color: "text-red-600",
+                bgColor: "bg-red-100"
+            },
+            {
+                id: 6,
+                name: "Xử lý tài sản thế chấp",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    <path d="M8 12h8v2H8z"/>
+                </svg>`,
+                color: "text-indigo-600",
+                bgColor: "bg-indigo-100"
+            },
+            {
+                id: 7,
+                name: "Xóa ghi nợ",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>`,
+                color: "text-gray-600",
+                bgColor: "bg-gray-100"
+            },
+            {
+                id: 8,
+                name: "Đính chính giấy chứng nhận",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>`,
+                color: "text-orange-600",
+                bgColor: "bg-orange-100"
+            },
+            {
+                id: 9,
+                name: "Chuyển mục đích sử dụng",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M7 7h10v10H7z"/>
+                    <path d="M9 9h6v6H9z"/>
+                </svg>`,
+                color: "text-teal-600",
+                bgColor: "bg-teal-100"
+            },
+            {
+                id: 10,
+                name: "Tách, hợp thửa",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    <path d="M12 8l-4 4 4 4"/>
+                    <path d="M12 16l4-4-4-4"/>
+                </svg>`,
+                color: "text-pink-600",
+                bgColor: "bg-pink-100"
+            },
+            {
+                id: 11,
+                name: "Tách thửa kèm quyền",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    <path d="M8 12l2 2 6-6"/>
+                </svg>`,
+                color: "text-cyan-600",
+                bgColor: "bg-cyan-100"
+            },
+            {
+                id: 12,
+                name: "Cấp đổi",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M12 6l-3 3 3 3 3-3-3-3z"/>
+                </svg>`,
+                color: "text-lime-600",
+                bgColor: "bg-lime-100"
+            },
+            {
+                id: 13,
+                name: "Cấp lại",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M12 8v4l3 3"/>
+                </svg>`,
+                color: "text-amber-600",
+                bgColor: "bg-amber-100"
+            },
+            {
+                id: 14,
+                name: "Thu hồi Giấy chứng nhận",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>`,
+                color: "text-rose-600",
+                bgColor: "bg-rose-100"
+            },
+            {
+                id: 15,
+                name: "Đăng ký trước 01/08/2024",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M12 8v4l3 3"/>
+                    <path d="M8 12l2 2 6-6"/>
+                </svg>`,
+                color: "text-emerald-600",
+                bgColor: "bg-emerald-100"
+            },
+            {
+                id: 16,
+                name: "Đính chính Giấy chứng nhận",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>`,
+                color: "text-violet-600",
+                bgColor: "bg-violet-100"
+            },
+            {
+                id: 17,
+                name: "Cung cấp dữ liệu đất đai",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>`,
+                color: "text-sky-600",
+                bgColor: "bg-sky-100"
+            },
+            {
+                id: 18,
+                name: "Đăng ký giao dịch bảo đảm",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M8 12l2 2 6-6"/>
+                    <path d="M12 8v4l3 3"/>
+                </svg>`,
+                color: "text-fuchsia-600",
+                bgColor: "bg-fuchsia-100"
+            },
+            {
+                id: 19,
+                name: "Đo đạc",
+                icon: `<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M12 8l-4 4 4 4"/>
+                    <path d="M12 16l4-4-4-4"/>
+                    <path d="M8 12l2 2 6-6"/>
+                </svg>`,
+                color: "text-slate-600",
+                bgColor: "bg-slate-100"
+            }
+        ];
+
+        // Function to create logo cards
+        function createLogoCards() {
+            const container = document.getElementById('logo-container');
+            
+            logoData.forEach(logo => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300 cursor-pointer';
+                card.innerHTML = `
+                    <div class="${logo.bgColor} ${logo.color} rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                        ${logo.icon}
+                    </div>
+                    <h3 class="text-sm font-semibold text-gray-800 mb-2">${logo.name}</h3>
+                    <p class="text-xs text-gray-600">Thủ tục #${logo.id}</p>
+                `;
+                
+                // Add click event to show procedure details
+                card.addEventListener('click', () => {
+                    showProcedureDetails(logo.id);
+                });
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Function to show procedure details
+        function showProcedureDetails(procedureId) {
+            // Load procedure data from JSON
+            fetch('https://raw.githubusercontent.com/15110088/DB/refs/heads/master/thutuc.json')
+                .then(response => response.json())
+                .then(data => {
+                    const procedures = data.data['Trinh tu thu tuc'];
+                    const procedure = procedures.find(p => p.STT === procedureId.toString());
+                    
+                    if (procedure) {
+                        // Create modal with procedure details
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                        modal.innerHTML = `
+                            <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h2 class="text-xl font-bold text-gray-800">${procedure['Tên thủ tục']}</h2>
+                                    <button class="text-gray-500 hover:text-gray-700" onclick="this.closest('.fixed').remove()">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <h3 class="font-semibold text-gray-700">Căn cứ pháp lý:</h3>
+                                        <p class="text-sm text-gray-600">${procedure['Căn cứ pháp lý']}</p>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-700">Thành phần hồ sơ:</h3>
+                                        <ul class="text-sm text-gray-600 list-disc list-inside">
+                                            ${Array.isArray(procedure['Thành phần hồ sơ giấy tờ']) 
+                                                ? procedure['Thành phần hồ sơ giấy tờ'].map(item => `<li>${item}</li>`).join('')
+                                                : `<li>${procedure['Thành phần hồ sơ giấy tờ']}</li>`
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-gray-700">Thời gian giải quyết:</h3>
+                                        <p class="text-sm text-gray-600">${procedure['Thời gian giải quyết']}</p>
+                                    </div>
+                                    ${procedure['Ghi chú'] ? `
+                                    <div>
+                                        <h3 class="font-semibold text-gray-700">Ghi chú:</h3>
+                                        <ul class="text-sm text-gray-600 list-disc list-inside">
+                                            ${Array.isArray(procedure['Ghi chú']) 
+                                                ? procedure['Ghi chú'].map(item => `<li>${item}</li>`).join('')
+                                                : `<li>${procedure['Ghi chú']}</li>`
+                                            }
+                                        </ul>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                        
+                        document.body.appendChild(modal);
+                        
+                        // Close modal when clicking outside
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) {
+                                modal.remove();
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading procedure data:', error);
+                });
+        }
+
+        // Initialize logo cards when page loads
+      //  document.addEventListener('DOMContentLoaded', createLogoCards);
+    </script>
+</body>
+</html>
